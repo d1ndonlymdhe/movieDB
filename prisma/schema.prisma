@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "sqlite"
+    url      = env("DATABASE_URL")
+}
+
+model Post {
+    id        Int      @id @default(autoincrement())
+    name      String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([name])
+}
+
+model LikedMovie {
+    id        String @id @default(uuid())
+    tmdbId    String
+    likedById String
+    likedBy   User   @relation(fields: [likedById], references: [id])
+}
+
+model WatchedMovie {
+    id          String @id @default(uuid())
+    tmdbId      String
+    watchedById String
+    watchedBy   User   @relation(fields: [watchedById], references: [id])
+}
+
+model WatchListMovie {
+    id            String @id @default(uuid())
+    tmdbId        String
+    watchListById String
+    watchListBy   User   @relation(fields: [watchListById], references: [id])
+}
+
+model User {
+    id           String           @id @default(uuid())
+    username     String
+    hash         String
+    salt         String
+    tokens       Token[]
+    likedMovies  LikedMovie[]
+    watchedMovie WatchedMovie[]
+    watchList    WatchListMovie[]
+}
+
+model Token {
+    id    String @id @default(uuid())
+    value String
+    owner String
+    user  User   @relation(fields: [owner], references: [id])
+}
